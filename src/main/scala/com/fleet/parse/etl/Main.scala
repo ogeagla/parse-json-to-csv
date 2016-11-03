@@ -53,36 +53,29 @@ object Etl {
 
   def main (args: Array[String]) {
 
-    val source = scala.io.Source.fromFile("/home/octavian/github/parse-json-etl/src/main/scala/com/fleet/parse/etl/_User.json")
+    val source = scala.io.Source.fromFile("/home/octavian/github/parse-json-etl/_User.json")
+    println("getting lines from source")
     val lines = try source.mkString finally source.close()
-
+    println("parsing lines")
     val parsedLines = parse(lines)
 
-    println(parsedLines)
+    println("lines: " + parsedLines.children.length)
 
     val stuff: List[JsonAST.JValue] = parsedLines.children
-
+    println("extracting emails")
     val theEmails: List[String] = for {
       JObject(results) <- parsedLines
       JField("email", JString(email)) <- results
     } yield email
 
-    println(theEmails)
+    println("emails: "+ theEmails.length)
 
-
-    val f = new File("/home/octavian/github/parse-json-etl/emails.csv")
+    val f = new File("/home/octavian/github/parse-json-etl/emails-nov-3-2016.csv")
 
     val writer = CSVWriter.open(f)
-
+    println("writing emails")
     theEmails.foreach(email => writer.writeRow(List(email)))
 
     writer.close()
-
-
-
-
-    //    println(parsedLines.values)
-
   }
-
 }
